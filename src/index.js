@@ -1,12 +1,17 @@
+// require stuff
+const path = require('path')
 const express = require('express')
 
 const app = express() // setup express
 
-const port = 3000 // setup port variable
+const port = process.env.PORT || 3000 // setup port variable
 
+const publicPath = path.join(__dirname, '../public')
+
+app.use(express.static(publicPath))
 
 app.get('/', (req, res) => {
-    res.send('Chat App')
+    res.render(publicPath + 'index.html')
 })
 
 // server
