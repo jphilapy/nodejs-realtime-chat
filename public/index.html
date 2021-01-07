@@ -18,7 +18,9 @@
 <body>
     Chat App
 
+    <div id="messages"></div>
 
+    <!-- form -->
     <form id="message-form">
         <input name="message" type="text" placeholder="Message...">
         <button>Send Message</button>
@@ -26,6 +28,12 @@
 
     <button id="send-location">Send location</button>
 
+    <!-- setup template -->
+    <script id="message-template" type="text/html">
+        <div>
+            <p>{{message}}</p>
+        </div>
+    </script>
 
     <!-- scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
