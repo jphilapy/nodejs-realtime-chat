@@ -38,6 +38,9 @@ $sendLocation.addEventListener('click', () => {
     // disable button till we get positive feedback
     $sendLocation.setAttribute('disabled', 'disabled')
 
+    // change text to indicate status
+    $sendLocation.textContent = 'Fetching location...'
+
     navigator.geolocation.getCurrentPosition((position) => {
         socket.emit('sendLocation', {
             'latitude': position.coords.latitude,
@@ -47,6 +50,9 @@ $sendLocation.addEventListener('click', () => {
 
             // everything works good, enable the button again
             $sendLocation.removeAttribute('disabled')
+
+            // return text to previous state
+            $sendLocation.textContent = 'Send location'
         })
     })
 })
