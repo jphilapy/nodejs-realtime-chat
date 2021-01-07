@@ -26,6 +26,10 @@ io.on('connection', (socket) => {
         io.emit('message', message) // this allows us to update all clients connected to the site
     })
 
+    socket.on('sendLocation', (location) => {
+        io.emit('message', location) // this allows us to update all clients connected to the site
+    })
+
     socket.on('disconnect', () => {
         io.emit('message', 'A user disconnected.')
     })
