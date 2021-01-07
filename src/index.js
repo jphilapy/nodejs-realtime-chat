@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('sendLocation', (location, callback) => {
-        io.emit('locationMessage', `<a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}">My Location</a>`) // this allows us to update all clients connected to the site
+        io.emit('locationMessage', `https://www.google.com/maps?q=${location.latitude},${location.longitude}`) // this allows us to update all clients connected to the site
         callback()
     })
 
