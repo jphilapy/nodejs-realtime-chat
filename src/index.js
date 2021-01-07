@@ -3,6 +3,7 @@ const path = require('path')
 const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
+const Filter = require('bad-words')
 
 const app = express() // setup express
 const server = http.createServer(app)
@@ -22,12 +23,20 @@ io.on('connection', (socket) => {
     socket.emit('message', "Welcome!") // sends message to single connection
     socket.broadcast.emit('message', 'A new user has joined!') // sends message to everyone except for the new connection
 
-    socket.on('sendMessage', (message) => {
+    socket.on('sendMessage', (message, callback) => {
+        const filter = new Filter()
+
+        if (filter.isProfane(message)) {
+            return callback('Profanity is not allowed.')
+        }
+
         io.emit('message', message) // this allows us to update all clients connected to the site
+        callback()
     })
 
-    socket.on('sendLocation', (location) => {
-        io.emit('message', location) // this allows us to update all clients connected to the site
+    socket.on('sendLocation', (location, callback) => {
+        io.emit('message', `https://www.google.com/maps?q=${location.latitude},${location.longitude}`) // this allows us to update all clients connected to the site
+        callback()
     })
 
     socket.on('disconnect', () => {
