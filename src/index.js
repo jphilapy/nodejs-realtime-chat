@@ -36,7 +36,7 @@ io.on('connection', (socket) => {
             return callback('Profanity is not allowed.')
         }
 
-        io.emit('message', generateMessage(message)) // this allows us to update all clients connected to the site
+        io.to('Center City').emit('message', generateMessage(message)) // this allows us to update all clients connected to the site
         callback()
     })
 
