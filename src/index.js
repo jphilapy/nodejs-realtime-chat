@@ -4,7 +4,7 @@ const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
-const { generateMessage } = require('./utils/messages')
+const { generateMessage, generateLocationMessage } = require('./utils/messages')
 
 const app = express() // setup express
 const server = http.createServer(app)
@@ -38,7 +38,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('sendLocation', (location, callback) => {
-        io.emit('locationMessage', `https://www.google.com/maps?q=${location.latitude},${location.longitude}`) // this allows us to update all clients connected to the site
+        io.emit('locationMessage', generateLocationMessage(`https://www.google.com/maps?q=${location.latitude},${location.longitude}`)) // this allows us to update all clients connected to the site
         callback()
     })
 
