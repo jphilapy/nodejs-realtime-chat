@@ -25,6 +25,7 @@ io.on('connection', (socket) => {
     socket.on('join', (options, callback) => {
         const { error, user } = addUser({ id: socket.id, ...options })
 
+
         if (error) {
             return callback(error)
         }
@@ -46,14 +47,14 @@ io.on('connection', (socket) => {
             return callback('Profanity is not allowed.')
         }
 
-        io.to(user.room).emit('message', generateMessage(message)) // this allows us to update all clients connected to the site
+        io.to(user.room).emit('message', generateMessage(user.username, message)) // this allows us to update all clients connected to the site
         callback()
     })
 
     socket.on('sendLocation', (location, callback) => {
         const user = getUser(socket.id)
 
-        io.to(user.room).emit('locationMessage', generateLocationMessage(`https://www.google.com/maps?q=${location.latitude},${location.longitude}`)) // this allows us to update all clients connected to the site
+        io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, `https://www.google.com/maps?q=${location.latitude},${location.longitude}`)) // this allows us to update all clients connected to the site
         callback()
     })
 
