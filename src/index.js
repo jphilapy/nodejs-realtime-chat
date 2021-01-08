@@ -5,6 +5,7 @@ const express = require('express')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users')
 
 const app = express() // setup express
 const server = http.createServer(app)
@@ -21,32 +22,47 @@ app.use(express.static(publicPath))
 io.on('connection', (socket) => {
     console.log('New websocket connection.')
 
-    socket.on('join', ({ username, room }) => {
-        socket.join(room)
+    socket.on('join', (options, callback) => {
+        const { error, user } = addUser({ id: socket.id, ...options })
+
+        if (error) {
+            return callback(error)
+        }
+
+        socket.join(user.room)
 
         // sends message to single connection
         socket.emit('message', generateMessage('Welcome!'))
-        socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined!`)) // sends message to everyone except for the new connection
+        socket.broadcast.to(user.room).emit('message', generateMessage(`${user.username} has joined!`)) // sends message to everyone except for the new connection
+
+        callback()
     })
 
     socket.on('sendMessage', (message, callback) => {
         const filter = new Filter()
+        const user = getUser(socket.id)
 
         if (filter.isProfane(message)) {
             return callback('Profanity is not allowed.')
         }
 
-        io.to('Center City').emit('message', generateMessage(message)) // this allows us to update all clients connected to the site
+        io.to(user.room).emit('message', generateMessage(message)) // this allows us to update all clients connected to the site
         callback()
     })
 
     socket.on('sendLocation', (location, callback) => {
-        io.emit('locationMessage', generateLocationMessage(`https://www.google.com/maps?q=${location.latitude},${location.longitude}`)) // this allows us to update all clients connected to the site
+        const user = getUser(socket.id)
+
+        io.to(user.room).emit('locationMessage', generateLocationMessage(`https://www.google.com/maps?q=${location.latitude},${location.longitude}`)) // this allows us to update all clients connected to the site
         callback()
     })
 
     socket.on('disconnect', () => {
-        io.emit('message', generateMessage('A user disconnected.'))
+        const user = removeUser(socket.id)
+
+        if (user) {
+            io.to(user.room).emit('message', generateMessage(`${user.username} has disconnected.`))
+        }
     })
 })
 
