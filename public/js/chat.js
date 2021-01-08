@@ -38,7 +38,6 @@ const autoscroll = () => {
     }
 }
 
-
 socket.on('message', (message) => {
     console.log(message)
     const html = Mustache.render(messageTemplate, {
