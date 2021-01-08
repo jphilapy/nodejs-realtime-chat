@@ -21,10 +21,13 @@ app.use(express.static(publicPath))
 io.on('connection', (socket) => {
     console.log('New websocket connection.')
 
-    // sends message to single connection
-    socket.emit('message', generateMessage('Welcome!'))
+    socket.on('join', ({ username, room }) => {
+        socket.join(room)
 
-    socket.broadcast.emit('message', generateMessage('A new user has joined!')) // sends message to everyone except for the new connection
+        // sends message to single connection
+        socket.emit('message', generateMessage('Welcome!'))
+        socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined!`)) // sends message to everyone except for the new connection
+    })
 
     socket.on('sendMessage', (message, callback) => {
         const filter = new Filter()
@@ -55,3 +58,13 @@ app.get('/', (req, res) => {
 server.listen(port, () => {
     console.log('server is up on port.' + port)
 })
+
+/**
+ * NOTE:
+ * socket.emit - sends to specific client
+ * io.emit - sends to all clients
+ * socket.broadcast.emit - sends to all clients except for the one that initiated
+ * io.to.emit - sends message to everyone withing a scope (a room for instance)
+ * socket.broadcast.to.emit - same as socket.broadcast.emit, except within a limited scope, i.e., a room
+ *
+ */
